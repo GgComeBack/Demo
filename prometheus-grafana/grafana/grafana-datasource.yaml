@@ -1,0 +1,15 @@
+# config file version
+apiVersion: 1
+
+# list of datasources to insert/update depending
+datasources:
+  - name: k6influxdb
+    type: influxdb
+    access: proxy
+    database: k6
+    url: http://influxdb:8086
+    isDefault: true
+  - name: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090

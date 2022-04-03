@@ -1,0 +1,55 @@
+version: '3.5'
+networks:
+  reactor:
+    external: true
+services:
+  base-adresse-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.jvm
+    container_name: baseAdresse
+    ports:
+      - "8083:8080"
+    depends_on:
+      - base-adresse-postgres
+    environment:
+      - DATABASE_SERVER_NAME=base-adresse-postgres
+    networks:
+      - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+  # Bases de donnée
+  base-adresse-postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: demoDB
+      POSTGRES_USER: user
+    volumes:
+      - pgdataadresse:/var/lib/postgresql/data
+     # - ./data/postgresql/data:/data
+     # - ./data/postgresql/sql/10_initStructure.sql:/docker-entrypoint-initdb.d/10_initStructure.sql
+     # - ./data/postgresql/sql/99_init.sql:/docker-entrypoint-initdb.d/99_init.sql
+    networks:
+        - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+volumes: 
+     pgdataadresse:
+        external: true
+        name: baseAdresse

@@ -1,0 +1,30 @@
+version: '3.5'
+
+networks:
+  reactor:
+    external: true
+
+services:
+  influxdb:
+    container_name: influxdb
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+    networks:
+      - reactor
+  k6:
+    container_name: k6
+    depends_on:
+      - influxdb
+    image: loadimpact/k6:latest
+    ports:
+      - "6565:6565"
+    environment:
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+    command: run /k6-scripts/loadTest.js --out influxdb=http://influxdb:8086/k6
+    volumes:
+      - ./js:/k6-scripts
+    networks:
+      - reactor

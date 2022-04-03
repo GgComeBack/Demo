@@ -1,0 +1,31 @@
+version: '3.5'
+networks:
+  reactor:
+    external: true
+services:
+  concentrateur-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.jvm
+    container_name: concentrateur
+    ports:
+      - "8085:8080"
+    depends_on:
+      - baseadresse-server
+      - basesiret-server
+    environment:
+      - DATABASE_SERVER_NAME=base-adresse-postgres
+    networks:
+      - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+volumes: 
+     pgdataadresse:
+        external: true
+        name: baseAdresse

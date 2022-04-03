@@ -1,0 +1,15 @@
+jdbcSettings:
+  url: "jdbc:postgresql://127.0.0.1:5433/demoDB"
+  username: "user2"
+  password: "password2"
+  driverClassName: "org.postgresql.Driver"
+
+packageName: "demo.dto.entity"
+
+interfaceRules:
+  - interfaces: [{name: "java.io.Serializable"}]
+
+classAnnotationRules:
+  - annotations:
+      - className: "lombok.Getter"
+      - className: "lombok.Setter"

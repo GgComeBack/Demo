@@ -1,0 +1,33 @@
+FROM openjdk:17.0.2-jdk AS build
+WORKDIR /workdir/server
+COPY .mvn /workdir/server/.mvn
+COPY pom.xml /workdir/server/pom.xml
+COPY mvnw /workdir/server/mvnw
+RUN ./mvnw dependency:go-offline
+
+COPY src/main/java /workdir/server/src/main/java
+COPY src/main/resources /workdir/server/src/main/resources
+RUN ./mvnw clean package -DskipTests
+RUN mkdir -p target/dependency
+WORKDIR /workdir/server/target/dependency
+RUN jar -xf ../*.jar
+
+FROM openjdk:17.0.2-jdk
+# Switch to root user
+USER root
+# Set user and group
+ARG user=appuser
+ARG group=appuser
+ARG uid=1000
+ARG gid=1000
+RUN groupadd -g ${gid} ${group}
+RUN useradd -u ${uid} -g ${group} -s /bin/sh -m ${user}
+# Switch to user
+USER ${uid}:${gid}
+EXPOSE 8080
+VOLUME /tmp
+ARG DEPENDENCY=/workdir/server/target/dependency
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+ENTRYPOINT ["java","-cp","app:app/lib/*","demo.DemoApplication"]
