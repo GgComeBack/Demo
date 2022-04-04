@@ -36,9 +36,9 @@ services:
       POSTGRES_USER: user
     volumes:
       - pgdataadresse:/var/lib/postgresql/data
-     # - ./data/postgresql/data:/data
-     # - ./data/postgresql/sql/10_initStructure.sql:/docker-entrypoint-initdb.d/10_initStructure.sql
-     # - ./data/postgresql/sql/99_init.sql:/docker-entrypoint-initdb.d/99_init.sql
+      - ./data/postgresql/data:/data
+      - ./data/postgresql/sql/10_initStructure.sql:/docker-entrypoint-initdb.d/10_initStructure.sql
+      - ./data/postgresql/sql/99_init.sql:/docker-entrypoint-initdb.d/99_init.sql
     networks:
         - reactor
     deploy:

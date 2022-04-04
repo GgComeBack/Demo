@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import papaparse from './papaparse/papaparse.js';
+import papaparse from './papaparse/papaparse.min.js';
 import { check, sleep } from 'k6';
 import { Trend, Rate } from 'k6/metrics';
 import { SharedArray } from 'k6/data';
