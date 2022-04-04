@@ -8,8 +8,10 @@ datasources:
     access: proxy
     database: k6
     url: http://influxdb:8086
+    uid: P76A45B24F43298D1
     isDefault: true
   - name: prometheus
     type: prometheus
     access: proxy
     url: http://prometheus:9090
+    uid: P1809F7CD0C75ACF3

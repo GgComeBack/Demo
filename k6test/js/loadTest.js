@@ -6,10 +6,11 @@ import { SharedArray } from 'k6/data';
 
 export let options = {
   stages: [
-      { duration: "10s", target: 20 },
-      { duration: "100s", target: 20 },
-      { duration: "10s", target: 0 }
-  ]
+      { duration: "10s", target: 100 },
+      { duration: "100s", target: 100 },
+      { duration: "10s", target: 100 }
+  ],
+   noConnectionReuse: true
 };
 
 // not using SharedArray here will mean that the code in the function call (that is what loads and
@@ -26,17 +27,15 @@ export default function () {
 
   const params = {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/stream+json',
     },
   };
 
-  const url = uri + "?page=" + Math.floor(Math.random() * 10) + "&size=" + Math.floor(Math.random() * 100) + "&siret=" + csvData[Math.floor(Math.random() * csvData.length)].siren + "%25";
+  const url = uri + "?page=" + Math.floor(Math.random() * 3) + "&size=" + (1+Math.floor(Math.random() * 100)) + "&siret=" + csvData[Math.floor(Math.random() * csvData.length)].siren + "%25";
   console.log(url);
   const response = http.get(url, params);
     check(response, {
       'response code was 20X': (res) => res.status == 200 || res.status == 206 || res.status == 204,
     });
-  getTrend.add(response.timings.duration);
-
 
 }

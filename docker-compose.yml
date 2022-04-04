@@ -1,0 +1,180 @@
+version: '3.5'
+
+networks:
+  reactor:
+    external: true
+
+services:
+  influxdb:
+    container_name: influxdb
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+    networks:
+      - reactor
+  k6:
+    container_name: k6
+    image: loadimpact/k6:latest
+    depends_on:
+      - influxdb
+      - baseadresse-server
+      - basesiret-server
+      - concentrateur-server
+    ports:
+      - "6565:6565"
+    environment:
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+    command: run /k6-scripts/loadTest.js --out influxdb=http://influxdb:8086/k6
+    volumes:
+      - ./k6test/js:/k6-scripts
+    networks:
+      - reactor
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus-grafana/env/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - reactor
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    env_file:
+      - ./prometheus-grafana/env/grafana.env
+    volumes:
+      - ./prometheus-grafana/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./prometheus-grafana/grafana/grafana-dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ./prometheus-grafana/grafana/grafana-datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    networks:
+      - reactor
+  concentrateur-server:
+    build:
+      context: ./concentrateur
+      dockerfile: Dockerfile.jvm
+    container_name: concentrateur
+    ports:
+      - "8085:8080"
+    depends_on:
+      - baseadresse-server
+      - basesiret-server
+    environment:
+      - DATABASE_SERVER_NAME=base-adresse-postgres
+    networks:
+      - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+  # Application
+  base-siret-server:
+    build:
+      context: ./baseSiret
+      dockerfile: Dockerfile.jvm
+    container_name: baseSiret
+    ports:
+      - "8082:8080"
+    depends_on:
+      - basesiret-postgres
+    environment:
+      - DATABASE_SERVER_NAME=basesiret-postgres
+    networks:
+      - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+  # Bases de donnée
+  basesiret-postgres:
+    build:
+      context: ./baseSiret/data/postgresql
+      dockerfile: Dockerfile
+    ports:
+      - "5433:5433"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password2
+      POSTGRES_DB: demoDB
+      POSTGRES_USER: user2
+    command: -p 5433
+    volumes:
+      - pgbaseSiret:/var/lib/postgresql/data
+      - ./baseSiret/data/postgresql/data:/data
+      - ./baseSiret/data/postgresql/sql/10_initStructure.sql:/docker-entrypoint-initdb.d/10_initStructure.sql
+      - ./baseSiret/data/postgresql/sql/99_init.sql:/docker-entrypoint-initdb.d/99_init.sql
+    networks:
+      - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+  base-adresse-server:
+    build:
+      context: ./baseAdresse
+      dockerfile: Dockerfile.jvm
+    container_name: baseAdresse
+    ports:
+      - "8083:8080"
+    depends_on:
+      - base-adresse-postgres
+    environment:
+      - DATABASE_SERVER_NAME=base-adresse-postgres
+    networks:
+      - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+  # Bases de donnée
+  base-adresse-postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: demoDB
+      POSTGRES_USER: user
+    volumes:
+      - pgdataadresse:/var/lib/postgresql/data
+      - ./baseAdresse/data/postgresql/data:/data
+      - ./baseAdresse/data/postgresql/sql/10_initStructure.sql:/docker-entrypoint-initdb.d/10_initStructure.sql
+      - ./baseAdresse/data/postgresql/sql/99_init.sql:/docker-entrypoint-initdb.d/99_init.sql
+    networks:
+      - reactor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+volumes:
+  pgbaseSiret:
+    external: true
+    name: baseSiret
+  pgdataadresse:
+    external: true
+    name: baseAdresse

@@ -15,3 +15,8 @@ Voici les 5 fichiers par exemple pour le mois avril :
 - https://www.data.gouv.fr/fr/datasets/r/0835cd60-2c2a-497b-bc64-404de704ce89
 - https://www.data.gouv.fr/fr/datasets/r/9c4d5d9c-4bbb-4b9c-837a-6155cb589e26
 - https://www.data.gouv.fr/fr/datasets/r/825f4199-cadd-486c-ac46-a65a8ea1a047
+
+L'ensemble est disponible au travers du docker-compose à la racine.
+
+Grafana est disponible sur le port 3000 
+http://localhost:3000/

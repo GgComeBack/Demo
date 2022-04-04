@@ -10,6 +10,6 @@ public class PrometheusConfiguration {
 
     @Bean
     MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
-        return registry -> registry.config().commonTags("application", "adresse");
+        return registry -> registry.config().commonTags("application", "concentrateur");
     }
 }

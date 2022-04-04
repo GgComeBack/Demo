@@ -13,24 +13,20 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import reactor.util.function.Tuple2;
 
 @Repository
-public class SiretRepository {
+public class SiretRepository implements HttpInitRepository {
 
+    public static final String NAME_POOL = "poolSiret";
+    public static final int MAX_CONNEXTION = 100000;
+    public static final int PENDING_ACQUIRE_MAX_COUNT = MAX_CONNEXTION * 5;
     @Value("${api.partenaire.url.baseSiret}")
     private String urlBase;
 
-    private final WebClient webClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(logHttp())).build();
-
-    private HttpClient logHttp() {
-        return HttpClient
-                .create()
-                .wiretap("reactor.netty.http.client.HttpClient",
-                        LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL);
-    }
-
+    private final  WebClient webClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(logHttpAndMaxPoolsite(NAME_POOL, MAX_CONNEXTION, PENDING_ACQUIRE_MAX_COUNT))).build();
 
     public Flux<StockEtablissementDTO> searchSiret(String siret, Pageable pageable) {
         return webClient.get()
@@ -50,7 +46,9 @@ public class SiretRepository {
                 });
     }
 
+
     public Flux<StockEtablissementDTO> searchSiretFlux(String siret, Pageable pageable) {
+
         return webClient.get()
                 .uri(UriComponentsBuilder.fromHttpUrl(urlBase).path("etablissement")
                         .queryParam("siret", siret)

@@ -6,18 +6,24 @@ import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class AdresseRepository {
+public class AdresseRepository implements HttpInitRepository {
 
     @Value("${api.partenaire.url.baseAdresse}")
     private String urlBase;
 
-    private final WebClient webClient = WebClient.builder().build();
+    public static final String NAME_POOL = "poolAdresse";
+    public static final int MAX_CONNEXTION = 100000;
+    public static final int PENDING_ACQUIRE_MAX_COUNT = MAX_CONNEXTION * 5;
+
+    private final  WebClient webClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(logHttpAndMaxPoolsite(NAME_POOL, MAX_CONNEXTION, PENDING_ACQUIRE_MAX_COUNT))).build();
+
 
     public Flux<CityDTO> searchAdresse(String ville, String codePostal, String voie) {
         return webClient.get()
