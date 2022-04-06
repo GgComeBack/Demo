@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.function.BiFunction;
 
 @RestController
-@RequestMapping(value = "etablissement")
+@RequestMapping(value = "etablissements")
 @RequiredArgsConstructor
 public class StockEtablissementControler {
 

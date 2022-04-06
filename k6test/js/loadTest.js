@@ -22,13 +22,19 @@ const csvData = new SharedArray('another data name', function () {
   return papaparse.parse(open('./dataSiren.csv'), { header: true }).data;
 });
 
+export function setup() {
+  // 2. setup code
+  sleep(15);
+}
+
 export default function () {
-  const uri = "http://concentrateur-server:8080/concentrateur";
+  const uri = "http://concentrateur-server:8080/concentrateur/test";
 
   const params = {
     headers: {
       'Content-Type': 'application/stream+json',
     },
+    timeout: 600000,
   };
 
   const url = uri + "?page=" + Math.floor(Math.random() * 3) + "&size=" + (1+Math.floor(Math.random() * 100)) + "&siret=" + csvData[Math.floor(Math.random() * csvData.length)].siren + "%25";

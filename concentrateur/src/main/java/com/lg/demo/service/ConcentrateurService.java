@@ -21,17 +21,17 @@ public class ConcentrateurService {
 
     public Flux<EtablissementDTO> searchEtablissementFlux(String siret, Pageable pageable) {
         return siretRepository.searchSiretFlux(siret, pageable)
-                .flatMap(stockEtablissementDTO -> Mono.empty().then(getAdresseVerifierFlux(stockEtablissementDTO)));
+                .flatMap(stockEtablissementDTO -> Mono.empty().then(getAdresseVerifierFlux(stockEtablissementDTO)), 10);
     }
 
     public Flux<EtablissementDTO> searchEtablissement(String siret, Pageable pageable) {
         return siretRepository.searchSiret(siret, pageable)
-                .flatMap(stockEtablissementDTO -> Mono.empty().then(getAdresseVerifier(stockEtablissementDTO)));
+                .flatMap(stockEtablissementDTO -> Mono.empty().then(getAdresseVerifier(stockEtablissementDTO)), 10);
     }
 
     public Flux<EtablissementDTO> searchEtablissementV2(String siret, Pageable pageable) {
         return siretRepository.searchSiret(siret, pageable)
-                .flatMap(stockEtablissementDTO -> Mono.zip(Mono.just(new Object()), getAdresseVerifier(stockEtablissementDTO)))
+                .flatMap(stockEtablissementDTO -> Mono.zip(Mono.empty(), getAdresseVerifier(stockEtablissementDTO)))
                 .flatMap(tuple2 -> Mono.just(tuple2.getT2()));
     }
 

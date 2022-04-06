@@ -26,6 +26,6 @@ scrape_configs:
     metrics_path: /actuator/prometheus
 
     static_configs:
-      - targets: ['basesiret:8080','baseadresse:8080']
+      - targets: ['basesiret:8080','baseadresse:8080','concentrateur:8080']
       
       

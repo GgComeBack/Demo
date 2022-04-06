@@ -16,7 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping(value = "adresse")
+@RequestMapping(value = "adresses")
 @RequiredArgsConstructor
 public class CityControler {
 
