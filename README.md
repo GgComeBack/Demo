@@ -1,4 +1,4 @@
-Demo reactor R2DBC
+<h1>Demo reactor R2DBC</h1>
 
 Les fichiers sources des données proviennent de source open source :
 
@@ -16,7 +16,18 @@ Voici les 5 fichiers par exemple pour le mois avril :
 - https://www.data.gouv.fr/fr/datasets/r/9c4d5d9c-4bbb-4b9c-837a-6155cb589e26
 - https://www.data.gouv.fr/fr/datasets/r/825f4199-cadd-486c-ac46-a65a8ea1a047
 
-L'ensemble est disponible au travers du docker-compose à la racine.
+Pour lancer le projet :
+- Il faut creer deux Volumes :
+  - `docker volume create baseAdresse`
+  - `docker volume create baseSiret`
+- Il faut creer le reseau : <br>
+`docker network create -d bridge reactor`
 
-Grafana est disponible sur le port 3000 
-http://localhost:3000/
+L'ensemble est disponible au travers du docker-compose à la racine.
+pour lancer le projet: `docker-compose .\docker-compose.yml up`
+
+Pour visualiser les resultats sous Grafana l'interface est disponible sur le port 3000
+Trois tableaux de bord sont disponibles pour visualiser les résultats du tire de perf lancer en automatique.
+
+
+
